@@ -39,14 +39,13 @@ def display_board(board: List[int]):
     print(string)
 
 
-
 def look_for_solutions(
         board: List[int],
         remaining_numbers: List[int],
         step: int,
 
         # Cache
-        corner_tested: Set[int],
+        corners_tested: Set[int],
         start_time: float,
 ) -> None:
     """Look for solutions given board state and step to start from
@@ -70,7 +69,7 @@ def look_for_solutions(
     for i, number in enumerate(remaining_numbers):
         # If step is on corner and number has already been tested as a corner, skip it
         # # Avoid rotations this way
-        if step in CORNERS_EXCEPT_FIRST and number in corner_tested:
+        if step in CORNERS_EXCEPT_FIRST and number in corners_tested:
             continue
 
         # Add number to board and get next remaining numbers
@@ -91,23 +90,23 @@ def look_for_solutions(
                 board,
                 next_numbers,
                 step+1,
-                corner_tested=corner_tested,
+                corners_tested=corners_tested,
                 start_time=start_time,
             )
 
         # Number has been fully explored as first corner
         if step == 0:
-            corner_tested.add(number)
+            corners_tested.add(number)
 
     return
 
 
-start_time = time()
+start = time()
 look_for_solutions(
     board=[0] * CELLS_NB,
     remaining_numbers=[*NUMBERS],
     step=0,
-    corner_tested=set(),
-    start_time=start_time,
+    corners_tested=set(),
+    start_time=start,
 )
-print(f'Full run ended in {time()-start_time}s')
+print(f'Full run ended in {time()-start}s')
