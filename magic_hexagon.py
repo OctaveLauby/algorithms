@@ -1,7 +1,7 @@
 """Algorithm to solve magic hexagon problem."""
+from collections import deque
 from time import time
-from typing import List, Set
-import collections
+from typing import Deque, List, Set
 
 # Problem description
 FLOORS = 3
@@ -40,9 +40,9 @@ def display_board(board: List[int]):
     print(string)
 
 
-def look_for_solutions(
+def look_for_solutions_(
         board: List[int],
-        remaining_numbers: List[int],
+        remaining_numbers: Deque[int],
         step: int,
 
         # Cache
@@ -88,7 +88,7 @@ def look_for_solutions(
                 break
         else:
             # Completed lines are correct, we may continue
-            look_for_solutions(
+            look_for_solutions_(
                 board,
                 remaining_numbers,
                 step+1,
@@ -105,12 +105,17 @@ def look_for_solutions(
     return
 
 
-start = time()
-look_for_solutions(
-    board=[0] * CELLS_NB,
-    remaining_numbers=collections.deque(NUMBERS),
-    step=0,
-    corners_tested=set(),
-    start_time=start,
-)
-print(f'Full run ended in {time()-start}s')
+def look_for_solutions():
+    start = time()
+    look_for_solutions_(
+        board=[0] * CELLS_NB,
+        remaining_numbers=deque(NUMBERS),
+        step=0,
+        corners_tested=set(),
+        start_time=start,
+    )
+    print(f'Full run ended in {time()-start}s')
+
+
+if __name__ == '__main__':
+    look_for_solutions()
