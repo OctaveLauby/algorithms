@@ -1,12 +1,13 @@
-"""Algorithm to solve magic hexagon problem"""
+"""Algorithm to solve magic hexagon problem."""
 from time import time
 from typing import List, Set
+import collections
 
 # Problem description
 FLOORS = 3
 ROWS_NB = 2*FLOORS-1
 CELLS_NB = 3*FLOORS*(FLOORS-1)+1
-NUMBERS = list(range(1, CELLS_NB+1))
+NUMBERS = collections.deque(range(1, CELLS_NB+1))
 LINE_SUM = sum(range(1, CELLS_NB+1)) // ROWS_NB
 
 # Algo global variables
@@ -32,10 +33,10 @@ CORNERS_EXCEPT_FIRST = {2, 4, 6, 8, 10}
 
 
 def display_board(board: List[int]):
-    """Nice display of board"""
+    """Nice display of board."""
     string = BOARD_INDEXES_STR
     for i, n in enumerate(board):
-        string = string.replace(f'{i:02d}.', f'{n:02d}')
+        string = string.replace(f'{i:02d}.', f'{n:2d}')
     print(string)
 
 
@@ -48,7 +49,7 @@ def look_for_solutions(
         corners_tested: Set[int],
         start_time: float,
 ) -> None:
-    """Look for solutions given board state and step to start from
+    """Look for solutions given board state and step to start from.
 
     About:
         step define the index in board to place next number in (within remaining numbers)
@@ -66,15 +67,16 @@ def look_for_solutions(
         display_board(board)
         return
 
-    for i, number in enumerate(remaining_numbers):
+    for i in range(len(remaining_numbers)):
         # If step is on corner and number has already been tested as a corner, skip it
         # # Avoid rotations this way
-        if step in CORNERS_EXCEPT_FIRST and number in corners_tested:
+        number = remaining_numbers.pop()
+        if number in corners_tested and step in CORNERS_EXCEPT_FIRST:
+            remaining_numbers.appendleft(number)
             continue
 
         # Add number to board and get next remaining numbers
-        next_numbers = [*remaining_numbers]
-        board[step] = next_numbers.pop(i)
+        board[step] = number
 
         # Check whether lines we ended have the right sum
         for line in LINES_ENDED_BY_STEP[step]:
@@ -88,12 +90,14 @@ def look_for_solutions(
             # Completed lines are correct, we may continue
             look_for_solutions(
                 board,
-                next_numbers,
+                remaining_numbers,
                 step+1,
                 corners_tested=corners_tested,
                 start_time=start_time,
             )
 
+        # Add the removed number for the next iteration
+        remaining_numbers.appendleft(number)
         # Number has been fully explored as first corner
         if step == 0:
             corners_tested.add(number)
@@ -104,7 +108,7 @@ def look_for_solutions(
 start = time()
 look_for_solutions(
     board=[0] * CELLS_NB,
-    remaining_numbers=[*NUMBERS],
+    remaining_numbers=NUMBERS,
     step=0,
     corners_tested=set(),
     start_time=start,
