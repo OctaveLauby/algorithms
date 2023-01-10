@@ -36,7 +36,7 @@ def display_board(board: List[int]):
     """Nice display of board"""
     string = BOARD_INDEXES_STR
     for i, n in enumerate(board):
-        string = string.replace(f'{i:02d}.', f'{n:02d}')
+        string = string.replace(f'{i:02d}.', f'{n:2d}')
     print(string)
 
 
